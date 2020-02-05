@@ -20,17 +20,17 @@ Utnp_avg = Utnp_avg / 20;
 
 % plot the averaged fourier transformed signal at different isolevels
 fig_counter = 1;
-for level = 0.1:0.1:0.9
-    figure(fig_counter)
-    axis([-7 7 -7 7 -7 7])
-    isosurface(Kx, Ky, Kz, abs(Utnp_avg)/abs(max(Utnp_avg(:))), level);
-    view(30,-15)
-    xlabel('Kx'), ylabel('Ky'), zlabel('Kz')
-    set(gcf,'color','w');
-    imagewd = getframe(gcf);
-    imwrite(imagewd.cdata, num2str(fig_counter)+".jpeg", "Quality", 100);
-    fig_counter = fig_counter + 1;
-end
+% for level = 0.1:0.1:0.9
+%     figure(fig_counter)
+%     axis([-7 7 -7 7 -7 7])
+%     isosurface(Kx, Ky, Kz, abs(Utnp_avg)/abs(max(Utnp_avg(:))), level);
+%     view(30,-15)
+%     xlabel('Kx'), ylabel('Ky'), zlabel('Kz')
+%     set(gcf,'color','w');
+%     imagewd = getframe(gcf);
+%     imwrite(imagewd.cdata, num2str(fig_counter)+".jpeg", "Quality", 100);
+%     fig_counter = fig_counter + 1;
+% end
 
 % the center frequency
 f_x = 2;
