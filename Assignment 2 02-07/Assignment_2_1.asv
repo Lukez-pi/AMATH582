@@ -34,25 +34,21 @@ title('Signal of Interest, S(n)')
 % end
 
 
-% using different window width and sampling rate
-% width = [0.1, 1, 10, 100];
-% 
-% for i = 1:length(width)
-%     tslide_1 = 0:0.1:(length(S)/Fs);
-%     % tslide_2 = 0:0.3:(length(S)/Fs); 
-%     % tslide_3 = 0:1:(length(S)/Fs);
-%     % tslide_4 = 0:3:(length(S)/Fs);
-%     Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_1, S, ks);
-%     % Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_2, S, ks);
-%     % Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_3, S, ks);
-%     % Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_4, S, ks);
-% end
 
-% using different filters
-tslide_1 = 0:0.1:(length(S)/Fs);
-Sgt_spec_gaussian = create_spectrogram([], "gaussian", 10, t, tslide_1, S, ks);
-Sgt_spec_mexican_hat = create_spectrogram([], "mexican_hat", 0.3, t, tslide_1, S, ks);
-Sgt_spec_shannon = create_spectrogram([], "shannon", 1, t, tslide_1, S, ks);
+width = [10]; %[0.1] %[0.1, 1, 10];
+
+for i = 1:length(width)
+    tslide_1 = 0:0.1:(length(S)/Fs);
+    % tslide_2 = 0:0.3:(length(S)/Fs); 
+    % tslide_3 = 0:1:(length(S)/Fs);
+    % tslide_4 = 0:3:(length(S)/Fs);
+    Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_1, S, ks);
+    Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_1, S, ks);
+    Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_1, S, ks);
+    % Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_2, S, ks);
+    % Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_3, S, ks);
+    % Sgt_spec = create_spectrogram([], "gaussian", width(i), t, tslide_4, S, ks);
+end
 
 function [Sgt_spec] = create_spectrogram(Sgt_spec, filter, width, t, tslide, S, ks)
     for j = 1:length(tslide)
@@ -60,8 +56,6 @@ function [Sgt_spec] = create_spectrogram(Sgt_spec, filter, width, t, tslide, S, 
             g = exp(-width * (t-tslide(j)).^2);
         elseif filter == "mexican_hat"
             g = 2/(sqrt(3*width) * pi ^(1/4)) .* (1 - ((t- tslide(j))/width).^2) .* exp(-(t-tslide(j)).^2/(2*width^2));
-            max_g = max(g);
-            g = g/max_g;
         elseif filter == "shannon"
             factor = floor(length(t) / length(tslide));
             g = [zeros(1, j * factor) ones(1, floor(length(t)/10)) zeros(1, length(t) - floor(length(t)/10) - j * factor)];
@@ -76,21 +70,13 @@ function [Sgt_spec] = create_spectrogram(Sgt_spec, filter, width, t, tslide, S, 
         %subplot(3, 1, 3), plot(ks, abs(fftshift(Sgt))/max(abs(Sgt)))
         %drawnow
         %pause(0.1)
-        
-%         if j == length(tslide) / 2
-%             plot(t, S, 'k', t, g, 'r')
-%             xlabel("Time (s)")
-%             ylabel("Normalized Signal Intensity")
-%             axis([0 9 -0.5 1])
-%             set(gca, 'Fontsize', [16])
-%         end
     end
     
-    figure()
+    figure
     pcolor(tslide, ks((length(ks)/2 + 1):end)/(2*pi), Sgt_spec.')
     %title("Spectrogram of Handel (a = " + num2str(width) + ", resolution = " + int2str(length(tslide)) + ")", "fontSize", 10)
-    xlabel("Time (second)", "FontSize", 18)
-    ylabel("Frequency (Hz)", "FontSize", 18)
+    xlabel("time (second)", "FontSize", 18)
+    ylabel("frequency (Hz)", "FontSize", 18)
     shading interp
     set(gca, 'Fontsize', [16])
     colormap(hot)

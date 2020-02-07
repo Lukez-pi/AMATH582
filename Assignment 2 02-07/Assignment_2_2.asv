@@ -21,7 +21,7 @@ k1 = (2*pi/L1)*[0:n1/2-1 -n1/2:-1]; ks1 = fftshift(k1);
 plot((1:length(S1))/Fs1, S1);
 xlabel('Time [sec]'); ylabel('Amplitude');
 title('Mary had a little lamb (piano)'); drawnow
-p8 = audioplayer(S1, Fs1); playblocking(p8);
+% p8 = audioplayer(S, Fs); playblocking(p8);
 
 
 
@@ -29,11 +29,11 @@ width = [50];
 
 figure(3)
 y_lower = 0;
-y_upper = 1000;
+y_upper = 500;
 [Sgt_spec_1, k_c_1] = gabor_filter(width, S1, Fs1, t1, ks1, y_lower, y_upper);
 figure(4)
 y_lower = 600;
-y_upper = 2100;
+y_upper = 1500;
 [Sgt_spec_2, k_c_2] = gabor_filter(width, S2, Fs2, t2, ks2, y_lower, y_upper);
 
 function [Sgt_spec, k_c] = gabor_filter(width, S, Fs, t, ks, y_lower, y_upper)
@@ -48,7 +48,7 @@ function [Sgt_spec, k_c] = gabor_filter(width, S, Fs, t, ks, y_lower, y_upper)
             [~, idx] = max(abs(Sgt_s));
             idx = length(Sgt_s) - idx + 2;
             filter = exp(-0.2*(ks - ks(idx)).^2); 
-            filter = linspace(1, 1, length(S));
+            % filter = linspace(1, 1, length(S));
             k_c = [k_c; ks(idx)];
             Sgt_f = filter .* Sgt_s;
             truncated_Sgt_f = Sgt_f((length(Sgt_f)/2+2):end);
@@ -72,8 +72,6 @@ function [Sgt_spec, k_c] = gabor_filter(width, S, Fs, t, ks, y_lower, y_upper)
     shading interp
     set(gca, 'Fontsize', [14])
     hold on
-    plot([15.5, 16], [261.63, 261.63], '-r')
-    plot([15.5, 16], [293.66, 293.66], '-r')
-    plot([15.5, 16], [329.63, 329.63], '-r')
+    plot([15.5, 16], [261.63, 261.63])
     colormap(pink)
 end
