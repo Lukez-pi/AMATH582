@@ -1,0 +1,15 @@
+clear, clc, close all
+root_dir_cropped = "Data/CroppedYale";
+files = dir(root_dir_cropped);
+dirFlags = [files.isdir];
+subFolders = files(dirFlags);
+for k = 3 : length(subFolders) % the first 2 entries of subfolder will always be . and ..
+    subdir_name = subFolders(k).name;
+    subdir_list = dir(strcat(root_dir_cropped, "/", subdir_name));
+    img_name = {subdir_list.name};
+    for i = 3:length(img_name)
+        img_path = strcat(subdir_name, "/", img_name{);
+        I = imread(img_path);
+        imshow(I)
+    end
+end
