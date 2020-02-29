@@ -1,9 +1,10 @@
 clear, clc, close all
 
-load('Data/u_cropped')
-load('Data/v_cropped')
-load('Data/s_cropped')
-analysis_and_plot(u_crop, s_crop, v_crop, 192, 168)
+% read_img_data("Data/CroppedYale", "")
+% load('Data/u_cropped')
+% load('Data/v_cropped')
+% load('Data/s_cropped')
+% analysis_and_plot(u_crop, s_crop, v_crop, 192, 168)
 
 load('Data/u_uncropped')
 load('Data/v_uncropped')
@@ -42,17 +43,29 @@ function [] = analysis_and_plot(u, s, v, img_len, img_wid)
     ylabel("Energy")
     idx
     
-    tic
-    approx = u * s * v;
-    toc
-    
-    for i = 1:size(approx, 2)
-        img_data = approx(:, i);
-        max_val = max(img_data(:));
-        min_val = min(img_data(:));
-        img_data = (img_data - min_val) / (max_val - min_val) * 255;
-        imshow(reshape(img_data, img_len, img_wid), 'DisplayRange', [0, 255])
+    load('Data/yale_uncropped')
+    % plot singular value spectrum
+    for i = 1:size(u, 2)
+        imshow(reshape(u(:, i), img_len, img_wid), 'DisplayRange', [])
     end
+    
+    for i = 1:size(u, 2)
+        approx = u(:, 1:i) * s(1:i, 1:i) * v(:, 1:i)';
+        for j = 1:100
+            img_data = approx(:, j);
+            figure(1)
+            imshow(reshape(img_data, img_len, img_wid), 'DisplayRange', [])
+            figure(2)
+            imshow(reshape(img_matrix(:, j), img_len, img_wid), 'DisplayRange', [])
+        end            
+    end
+%     for i = 1:size(approx, 2)
+%         img_data = approx(:, i);
+%         max_val = max(img_data(:));
+%         min_val = min(img_data(:));
+%         img_data = (img_data - min_val) / (max_val - min_val) * 255;
+%         imshow(reshape(img_data, img_len, img_wid), 'DisplayRange', [0, 255])
+%     end
 end
 
 function [] = read_img_data(root_dir, save_file_name)
@@ -84,8 +97,10 @@ function [] = read_img_data(root_dir, save_file_name)
             imshow(I);
         end
     end
-    save_path = strcat("Data/", save_file_name);
-    save(save_path, 'img_matrix')
+    if length(save_file_name) > 1
+        save_path = strcat("Data/", save_file_name);
+        save(save_path, 'img_matrix')
+    end
 end
 
 function [u, s, v] = pca(img_matrix)
