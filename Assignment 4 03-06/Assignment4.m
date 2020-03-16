@@ -1,10 +1,10 @@
 clear, clc, close all
 
 % read_img_data("Data/CroppedYale", "")
-% load('Data/u_cropped')
-% load('Data/v_cropped')
-% load('Data/s_cropped')
-% analysis_and_plot(u_crop, s_crop, v_crop, 192, 168)
+load('Data/u_cropped')
+load('Data/v_cropped')
+load('Data/s_cropped')
+analysis_and_plot(u_crop, s_crop, v_crop, 192, 168)
 
 load('Data/u_uncropped')
 load('Data/v_uncropped')
@@ -18,13 +18,13 @@ function [] = analysis_and_plot(u, s, v, img_len, img_wid)
     plot(linspace(1, length(sig), length(sig)), sig, 'ko')
     xlabel("Mode")
     ylabel("Sigma")
-    % print_figure("Figures/Q1/sigma", 8.5, 8, 6)
+    print_figure("Figures/Q1/sigma_uncropped", 8.5, 8, 6)
     
     figure()
     semilogy(linspace(1, length(sig), length(sig)), sig, 'ko')
     xlabel("Mode")
     ylabel("log10(Sigma)")
-    % print_figure("Figures/Q1/log_sigma", 8.5, 8, 6)
+    print_figure("Figures/Q1/log_sigma_uncropped", 8.5, 8, 6)
     
     sig_sum = 0;
     idx = 0;
@@ -36,27 +36,32 @@ function [] = analysis_and_plot(u, s, v, img_len, img_wid)
             idx = idx + 1;
         end
     end
-    
+       
     figure()
     plot(linspace(1, length(sig), length(sig)), energy_arr, 'ko')
     xlabel("Mode")
     ylabel("Energy")
+    print_figure("Figures/Q1/energy_uncropped", 8.5, 8, 6)
     idx
     
     load('Data/yale_uncropped')
     % plot singular value spectrum
-    for i = 1:size(u, 2)
+    for i = 1:2 %size(u, 2)
         imshow(reshape(u(:, i), img_len, img_wid), 'DisplayRange', [])
+        print_figure(strcat("Figures/Q1/u", num2str(i), "_uncropped"), 8.5, 8, 6)
     end
     
-    for i = 1:size(u, 2)
+    for i = idx:idx %size(u, 2)
         approx = u(:, 1:i) * s(1:i, 1:i) * v(:, 1:i)';
-        for j = 1:100
+        for j = 1:1
             img_data = approx(:, j);
             figure(1)
             imshow(reshape(img_data, img_len, img_wid), 'DisplayRange', [])
+            print_figure("Figures/Q1/img_reconstruction_uncropped", 8.5, 8, 6)
+            
             figure(2)
             imshow(reshape(img_matrix(:, j), img_len, img_wid), 'DisplayRange', [])
+            print_figure("Figures/Q1/original_img_uncropped", 8.5, 8, 6)
         end            
     end
 %     for i = 1:size(approx, 2)

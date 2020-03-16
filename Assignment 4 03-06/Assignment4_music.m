@@ -1,9 +1,28 @@
 clear, clc, close all
 
 % save_test_training_data_1()
-% find_principal_component()
 % save_test_training_data_2()
-save_test_training_data_3()
+% save_test_training_data_3()
+
+% ploting(1, "f")
+% ploting(1, "s")
+% ploting(2, "f")
+% ploting(2, "s")
+% ploting(3, "f")
+% ploting(3, "s")
+
+fprintf("task 1\n")
+find_principal_component(1, "f")
+find_principal_component(1, "s")
+
+fprintf("task 2\n")
+find_principal_component(2, "f")
+find_principal_component(2, "s")
+
+fprintf("task 3\n")
+find_principal_component(3, "f")
+find_principal_component(3, "s")
+
 
 
 
@@ -139,7 +158,7 @@ function [] = save_test_training_data_1()
     plot(linspace(1, length(sig), length(sig)), sig_fourier, 'ko')
     xlabel("Mode")
     ylabel("Sigma")
-    save("Data/Q2/sigma_1_f.mat", "sig")
+    save("Data/Q2/sigma_1_f.mat", "sig_fourier")
     
     feature_num = 20;
     color = ['r', 'g', 'b'];
@@ -247,7 +266,7 @@ function [] = save_test_training_data_2()
     plot(linspace(1, length(sig), length(sig)), sig_fourier, 'ko')
     xlabel("Mode")
     ylabel("Sigma")
-    save("Data/Q2/sigma_2_f.mat", "sig")
+    save("Data/Q2/sigma_2_f.mat", "sig_fourier")
     
     feature_num = 20;
     pca = [];
@@ -357,7 +376,7 @@ function [] = save_test_training_data_3()
     plot(linspace(1, length(sig), length(sig)), sig_fourier, 'ko')
     xlabel("Mode")
     ylabel("Sigma")
-    save("Data/Q2/sigma_3_f.mat", "sig")
+    save("Data/Q2/sigma_3_f.mat", "sig_fourier")
     
     feature_num = 20;
     color = ['r', 'g', 'b'];
@@ -404,27 +423,75 @@ function [] = save_test_training_data_3()
     save(save_dir_test_label, "test_set_label");    
 end
 
-
-function [] = find_principal_component(music_genre)
-    load("Data/Q2/Part_1_training_data_f.mat");
-    load("Data/Q2/Part_1_training_label.mat");
-    load("Data/Q2/Part_1_test_data_f.mat");
-    load("Data/Q2/Part_1_test_label.mat");
+function [] = ploting(part_num, datatype)
+    s_struct = load(strcat("Data/Q2/sigma_", num2str(part_num), "_", datatype, ".mat"));
+    struct_name = fieldnames(s_struct);
+    struct_name = struct_name{1};
+    sig = s_struct.(struct_name);
+    figure()
+    plot(linspace(1, length(sig), length(sig)), sig, 'ko')
+    xlabel("Mode")
+    ylabel("Sigma")
+    print_figure(strcat("Figures/Q2/", num2str(part_num), "_sigma_", datatype), 8.5, 8, 6)
     
-    for feature_num = 1:10
+    semilogy(linspace(1, length(sig), length(sig)), sig, 'ko')
+    xlabel("Mode")
+    ylabel("log10(Sigma)")
+    print_figure(strcat("Figures/Q2/", num2str(part_num), "_log_sigma_", datatype), 8.5, 8, 6)
+    
+    load(strcat("Data/Q2/Part_", num2str(part_num), "_dim.mat"))
+    v_struct = load(strcat("Data/Q2/Part_", num2str(part_num), "_v_", datatype, ".mat"));
+    struct_name = fieldnames(v_struct);
+    struct_name = struct_name{1};
+    v = v_struct.(struct_name);
+    color = ['r', 'b', 'y'];
+    figure()
+    for i = 1:3
+        data = v(sum(clip_nums(1:i))+1:sum(clip_nums(1:i+1)), 1:3);
+        scatter3(data(:, 1), data(:, 2), data(:, 3), 12, color(i), 'filled', 'MarkerEdgeColor', 'k', 'LineWidth', 0.25)
+        hold on
+    end
+    xlabel("PCA1")
+    ylabel("PCA2")
+    zlabel("PCA3")
+    print_figure(strcat("Figures/Q2/", num2str(part_num), "_3D_projection_", datatype), 8.5, 8, 6)
+end
+
+function [] = find_principal_component(part_num, datatype)
+    training_struct = load(strcat("Data/Q2/Part_", num2str(part_num), "_training_data_", datatype, ".mat"));
+    struct_name = fieldnames(training_struct);
+    struct_name = struct_name{1};
+    training_set = training_struct.(struct_name);
+    load(strcat("Data/Q2/Part_", num2str(part_num), "_training_label.mat"));
+    
+    test_struct = load(strcat("Data/Q2/Part_", num2str(part_num), "_test_data_", datatype, ".mat"));
+    struct_name = fieldnames(test_struct);
+    struct_name = struct_name{1};
+    test_set = test_struct.(struct_name);
+    load(strcat("Data/Q2/Part_", num2str(part_num), "_test_label.mat"));
+    
+    for feature_num = 3:3
 %         test_s = test_set_data(:, 1:feature_num);
 %         train_s = training_set(:, 1:feature_num);
         
-        test_s = test_set_fourier(:, 1:feature_num);
-        train_s = training_set_fourier(:, 1:feature_num);
+        test_s = test_set(:, 1:feature_num);
+        train_s = training_set(:, 1:feature_num);
         
         t = templateSVM('Standardize',true);        
         mdl = fitcecoc(train_s, training_set_label, 'Learners', t);%, 'ClassNames', {'1', '2', '3'});
-        label = predict(mdl, test_s)
-        resubLoss(mdl)
-        nnz(label - test_set_label) / length(label) % error rate
+        label = predict(mdl, test_s);
+        L = resubLoss(mdl);
+        fprintf("This is the training set accuracy %d\n", (1 - L) * 100);
+        err_rate = nnz(label - test_set_label) / length(label); % error rate
+        fprintf("This is the test set accuracy %d\n", (1- err_rate) * 100);
     end
 end
 
-function [] = linear_discriminant_analysis()
+function [] = print_figure(file_name, font_size, fig_width, fig_height)
+    fig = gcf;
+    set(gca, 'Fontsize', font_size)
+    fig.PaperUnits = "centimeters";
+    fig.PaperPosition = [0 0 fig_width fig_height];
+    fig.PaperSize = [fig_width fig_height];
+    print(file_name,'-dpdf')
 end
